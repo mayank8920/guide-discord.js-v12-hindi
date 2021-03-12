@@ -3,7 +3,7 @@ const { config } = require("dotenv");
 const {prefix, token } = require("./config.json")
 
 const client = new Client({
-    disableEveryone: true
+    disableMentions: 'everyone'
 })
 
 // Collections
@@ -17,9 +17,9 @@ client.aliases = new Collection();
 });
 
 client.on("ready", () => {
-    console.log(`Hi, ${client.user.username} is now online!`);
+    console.log(`Hello, ${client.user.username} is now online!`);
 
-    client.user.setPresence("I am Devil") 
+    client.user.setPresence("I am developed by mayank") 
 })
 
 client.on("message", async message => {
