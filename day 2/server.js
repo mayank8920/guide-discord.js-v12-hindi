@@ -1,42 +1,45 @@
-const { Client, Collection } = require("discord.js");
+const {prefix} = require("./config.json")
 const { config } = require("dotenv");
-const {prefix, token } = require("./config.json")
+const discord = require("discord.js");
+const fs = require("fs");
+const client = new discord.Client({disableMentions: "everyone"});
+client.commands = new discord.Collection();
+client.aliases = new discord.Collection();
 
-const client = new Client({disableMentions: 'everyone'})
-
-// Collections
-client.commands = new Collection();
-client.aliases = new Collection();
-
-
-// Run the command loader
 ["command"].forEach(handler => {
-    require(`./handlers/${handler}`)(client);
+  require(`./handlers/${handler}`)(client);
 });
+
 
 client.on("ready", () => {
-    console.log(`Hello, ${client.user.username} is now online!`);
+    console.log(`Hi, ${client.user.username} is now online!`);
+
     client.user.setPresence("I am developed by mayank") 
 })
+  
+
+
 
 client.on("message", async message => {
-    if (message.author.bot) return;
-    if (!message.guild) return;
-    if (!message.content.startsWith(prefix)) return;
+  
+  if (!message.guild) return;
 
-    if (!message.member) message.member = await message.guild.fetchMember(message);
+  if (!message.content.startsWith(prefix)) return;
 
-    const args = message.content.slice(prefix.length).trim().split(/ +/g);
-    const cmd = args.shift().toLowerCase();
-    
-    if (cmd.length === 0) return;
-    //
-    let command = client.commands.get(cmd);
+  if (!message.member)
+    message.member = await message.guild.fetchMember(message);
 
-    if (!command) command = client.commands.get(client.aliases.get(cmd));
+  const args = message.content
+    .slice(prefix.length)
+    .trim()
+    .split(/ +/g);
+  const cmd = args.shift().toLowerCase();
 
-    if (command) 
-        command.run(client, message, args);
+  if (cmd.length === 0) return;
+  let command = client.commands.get(cmd);
+
+  if (!command) command = client.commands.get(client.aliases.get(cmd));
+  
+    if (command) command.run(client, message, args)
 });
-
-client.login(process.env.token);
+client.login(process.env.token)
